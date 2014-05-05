@@ -12,7 +12,7 @@
 var ZC = Ext.ns('Zenoss.component');
 var router = Zenoss.remote.PropertyMonitorRouter;
 
-Zenoss.form.ModelProperty = Ext.extend(Ext.Panel, {
+Zenoss.form.MonitoredProperty = Ext.extend(Ext.Panel, {
     constructor: function(config) {
         config = config || {};
         var record = config.record, classNameStore,
@@ -90,7 +90,7 @@ Zenoss.form.ModelProperty = Ext.extend(Ext.Panel, {
                 store: propertyNameStore
             }]
         });
-        Zenoss.form.ModelProperty.superclass.constructor.apply(this, arguments);
+        Zenoss.form.MonitoredProperty.superclass.constructor.apply(this, arguments);
     },
     /**
      * When the class changes this reloads the store for the property
@@ -111,9 +111,9 @@ Zenoss.form.ModelProperty = Ext.extend(Ext.Panel, {
 
 // Ext.version will be defined in ExtJS3 and undefined in ExtJS4.
 if (Ext.version === undefined) {
-    Ext.reg('mbp_property', 'Zenoss.form.ModelProperty');
+    Ext.reg('mbp_property', 'Zenoss.form.MonitoredProperty');
 } else {
-    Ext.reg('mbp_property', Zenoss.form.ModelProperty);
+    Ext.reg('mbp_property', Zenoss.form.MonitoredProperty);
 }
 
 }());

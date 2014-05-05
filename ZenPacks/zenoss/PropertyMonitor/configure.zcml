@@ -7,9 +7,9 @@
 
     <!-- API: Infos -->
     <adapter
-        provides=".datasources.ModelPropertyDataSource.IModelPropertyDataSourceInfo"
-        for=".datasources.ModelPropertyDataSource.ModelPropertyDataSource"
-        factory=".datasources.ModelPropertyDataSource.ModelPropertyDataSourceInfo"
+        provides=".datasources.MonitoredPropertyDataSource.IMonitoredPropertyDataSourceInfo"
+        for=".datasources.MonitoredPropertyDataSource.MonitoredPropertyDataSource"
+        factory=".datasources.MonitoredPropertyDataSource.MonitoredPropertyDataSourceInfo"
         />
 
 	<!-- API: Routers -->

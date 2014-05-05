@@ -19,7 +19,7 @@ from Products.ZenCollector.services.config import CollectorConfigService
 from Products.ZenUtils.Utils import unused
 from Products.Zuul.interfaces import IInfo
 
-from ZenPacks.zenoss.PropertyMonitor.datasources.ModelPropertyDataSource import ModelPropertyDataSource
+from ZenPacks.zenoss.PropertyMonitor.datasources.MonitoredPropertyDataSource import MonitoredPropertyDataSource
 
 # Make pyflakes happy.
 unused(Globals)
@@ -34,7 +34,7 @@ class PropertyMonitorService(CollectorConfigService):
         proxy.thresholds = []
 
         proxy.thresholds += device.getThresholdInstances(
-            ModelPropertyDataSource.sourcetype)
+            MonitoredPropertyDataSource.sourcetype)
 
         # We only worry about monitoring templates against components right now.
         for component in device.getMonitoredComponents():
@@ -53,14 +53,14 @@ class PropertyMonitorService(CollectorConfigService):
                         log.exception(e)
 
             proxy.thresholds += component.getThresholdInstances(
-                ModelPropertyDataSource.sourcetype)
+                MonitoredPropertyDataSource.sourcetype)
 
         return proxy
 
     def _getDataSourcesFromTemplate(self, template):
         datasources = []
 
-        for ds in template.getRRDDataSources("Modeled Property Value"):
+        for ds in template.getRRDDataSources("Property"):
             if not ds.enabled:
                 continue
             datasources.append(ds)
