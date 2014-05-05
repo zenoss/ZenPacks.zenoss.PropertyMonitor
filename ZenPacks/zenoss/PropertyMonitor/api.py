@@ -108,7 +108,7 @@ class PropertyMonitorRouter(DirectRouter):
     def getClasses(self, query):
         """
         @param query: Should contain 'record=' the uid of the applicable datasource
-        @returns all of the defined counter maps groups in the form
+        @returns all of the defined classes, grouped in the form
         {
             'data': [{'key':key, 'label':label}, ...],
             'success': True
@@ -122,7 +122,7 @@ class PropertyMonitorRouter(DirectRouter):
     def getProperties(self, query, class_name):
         """
         @param query: Should contain 'record=' the uid of the applicable datasource
-        @param class_name: must be a group from getClasses method
+        @param class_name: must be a class from getClasses method
         @returns full names all of the properties from this class
         {
             'data': [{'key':key, 'label':label}, ...],

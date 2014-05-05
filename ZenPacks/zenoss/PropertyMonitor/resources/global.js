@@ -54,7 +54,7 @@ Zenoss.form.MonitoredProperty = Ext.extend(Ext.Panel, {
                     class_name: record.class_name
                 },
                 callback: function(){
-                    this.CounterKeyCombo.setValue(record.property_name);
+                    this.PropertyKeyCombo.setValue(record.property_name);
                 },
                 scope:this
             },
@@ -79,9 +79,9 @@ Zenoss.form.MonitoredProperty = Ext.extend(Ext.Panel, {
                 store: classNameStore
             },{
                 xtype: 'combo',
-                fieldLabel: _t('Counter'),
+                fieldLabel: _t('Property'),
                 name: 'property_name',
-                ref: 'CounterKeyCombo',
+                ref: 'PropertyKeyCombo',
                 typeAhead: false,
                 triggerAction: 'all',                
                 queryMode: 'local',
@@ -97,7 +97,7 @@ Zenoss.form.MonitoredProperty = Ext.extend(Ext.Panel, {
      **/
     updateProperties: function () {
         var class_name = this.ClassKeyCombo.value,
-        cmp = this.CounterKeyCombo;
+        cmp = this.PropertyKeyCombo;
 
         // reload the store
         cmp.getStore().load({
