@@ -2,7 +2,7 @@
 # or saved.  Do not modify them directly here.
 # NB: PACKAGES is deprecated
 NAME = "ZenPacks.zenoss.PropertyMonitor"
-VERSION = "2.0.0"
+VERSION = "1.0.0-dev"
 AUTHOR = "ZenossLabs <labs@zenoss.com>"
 LICENSE = "GPLv2"
 NAMESPACE_PACKAGES = [u'ZenPacks', u'ZenPacks.zenoss']
