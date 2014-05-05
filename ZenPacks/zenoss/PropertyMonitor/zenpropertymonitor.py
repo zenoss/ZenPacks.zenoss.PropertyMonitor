@@ -14,6 +14,8 @@ Model, event and metric collection for VMware vSphere.
 import logging
 log = logging.getLogger('zen.PropertyMonitor')
 
+import Globals
+
 import zope.component
 import zope.interface
 
