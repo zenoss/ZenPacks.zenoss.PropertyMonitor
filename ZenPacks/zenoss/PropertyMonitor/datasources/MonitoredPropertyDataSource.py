@@ -125,6 +125,10 @@ class MonitoredPropertyDataSource(ZenPackPersistence, SimpleRRDDataSource):
         property_name = REQUEST.get('property_name')
         results = ICatalogTool(device).search(query=Eq('meta_type', class_name))
 
+        if not results.total:
+            out.write("0 objects found. No test performed.\n")
+            return
+
         if results.total > 10:
             out.write("%d %s components found, showing first 10<p>\n" % (results.total, class_name))
 
@@ -135,7 +139,7 @@ class MonitoredPropertyDataSource(ZenPackPersistence, SimpleRRDDataSource):
 
             out.write("&nbsp;&nbsp;&nbsp; '%s' %s = %s<br>\n" % (obj.titleOrId(), property_name, property_value))
 
-            if i+1 == 10: 
+            if i + 1 == 10:
                 break
 
 
