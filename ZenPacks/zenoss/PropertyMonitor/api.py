@@ -11,7 +11,8 @@
 API interfaces and default implementations.
 '''
 
-from zope.interface import implements
+import zope.schema
+from zope.interface import implements, providedBy
 
 from Products.ZenUtils.Ext import DirectRouter, DirectResponse
 
@@ -74,8 +75,14 @@ class PropertyMonitorFacade(ZuulFacade):
 
                 # 1)  Any fields identified as numeric in the info interface (that is,
                 #     from the 'Details' pane in the UI)
-                fields = FormBuilder(info).fields()
-                numberfields = set([x for x in fields if fields[x]['xtype'] in numericXtypes])
+                numberfields = set()
+
+                for iface in providedBy(info):
+                    f = zope.schema.getFields(iface)
+                    numberfields.update(
+                        k for k, v in f.iteritems()
+                        if getattr(v, 'xtype', None) in numericXtypes)
+
 
                 # 2) This is fuzzier, but we also include any fields not exposed through the
                 #    details pane, but which are still in the info adaptor, and which match
