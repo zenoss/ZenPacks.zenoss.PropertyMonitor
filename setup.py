@@ -2,11 +2,11 @@
 # or saved.  Do not modify them directly here.
 # NB: PACKAGES is deprecated
 NAME = "ZenPacks.zenoss.PropertyMonitor"
-VERSION = "1.0.0-dev"
-AUTHOR = "ZenossLabs <labs@zenoss.com>"
+VERSION = "1.0.0dev"
+AUTHOR = "Zenoss"
 LICENSE = "GPLv2"
-NAMESPACE_PACKAGES = [u'ZenPacks', u'ZenPacks.zenoss']
-PACKAGES = [u'ZenPacks', u'ZenPacks.zenoss', u'ZenPacks.zenoss.PropertyMonitor']
+NAMESPACE_PACKAGES = ['ZenPacks', 'ZenPacks.zenoss']
+PACKAGES = ['ZenPacks', 'ZenPacks.zenoss', 'ZenPacks.zenoss.PropertyMonitor']
 INSTALL_REQUIRES = []
 COMPAT_ZENOSS_VERS = ">=4.2"
 PREV_ZENPACK_NAME = ""

@@ -1,4 +1,11 @@
-
+##############################################################################
+#
+# Copyright (C) Zenoss, Inc. 2014, all rights reserved.
+#
+# This content is made available according to terms specified in
+# License.zenoss under the directory where your Zenoss product is installed.
+#
+##############################################################################
 
 import logging
 LOG = logging.getLogger('ZenPacks.zenoss.PropertyMonitor.utils')
@@ -17,10 +24,10 @@ add_local_lib_path()
 
 
 def get_all_subclasses(class_):
-	subclasses = []
+    subclasses = []
 
-	for subclass in class_.__subclasses__():
-		subclasses.append(subclass)
-		subclasses.extend(get_all_subclasses(subclass))
+    for subclass in class_.__subclasses__():
+        subclasses.append(subclass)
+        subclasses.extend(get_all_subclasses(subclass))
 
-	return subclasses
+    return subclasses

@@ -67,7 +67,6 @@ class PropertyMonitorService(CollectorConfigService):
 
         return datasources
 
-
     def remote_fetch_values(self, valueSpecs):
         for spec in valueSpecs:
             try:
@@ -123,10 +122,10 @@ class PropertyMonitorDataSourceConfig(pb.Copyable, pb.RemoteCopy):
     """
     Represents a single PropertyMonitor datasource.
     """
-    
+
     def __init__(self, device, component, template, datasource):
         self.device = device.id
-        self.datasourceId = datasource.id               
+        self.datasourceId = datasource.id
         self.class_name = datasource.class_name
         self.component_path = component.getPrimaryUrlPath()
         self.property_name = datasource.property_name
@@ -136,7 +135,7 @@ class PropertyMonitorDataSourceConfig(pb.Copyable, pb.RemoteCopy):
             self.rrdConfig[dp.id] = RRDConfig(component, datasource, dp)
 
 
-pb.setUnjellyableForClass(PropertyMonitorDataSourceConfig, PropertyMonitorDataSourceConfig)    
+pb.setUnjellyableForClass(PropertyMonitorDataSourceConfig, PropertyMonitorDataSourceConfig)
 
 
 class RRDConfig(pb.Copyable, pb.RemoteCopy):
@@ -145,6 +144,7 @@ class RRDConfig(pb.Copyable, pb.RemoteCopy):
     Contains the create command and the min and max 
     values for a datapoint
     """
+
     def __init__(self, component, datasource, dp):
         self.dpName = dp.name()
         self.command = dp.createCmd
@@ -155,6 +155,4 @@ class RRDConfig(pb.Copyable, pb.RemoteCopy):
         self.rrdPath = '/'.join((component.rrdPath(), dp.name()))
 
 
-pb.setUnjellyableForClass(RRDConfig, RRDConfig)        
-
-
+pb.setUnjellyableForClass(RRDConfig, RRDConfig)

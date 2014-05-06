@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * Copyright (C) Zenoss, Inc. 2013, all rights reserved.
+ * Copyright (C) Zenoss, Inc. 2014, all rights reserved.
  *
  * This content is made available according to terms specified in
  * License.zenoss under the directory where your Zenoss product is installed.
@@ -19,9 +19,9 @@ Zenoss.form.MonitoredProperty = Ext.extend(Ext.Panel, {
             propertyNameStore;
 
         // Ext.version will be defined in ExtJS3 and undefined in ExtJS4.
-        var storeClass = Ext.data.DirectStore        
+        var storeClass = Ext.data.DirectStore;
         if (Ext.version === undefined) {
-            storeClass = Zenoss.NonPaginatedStore
+            storeClass = Zenoss.NonPaginatedStore;
         }
 
         // store for the first combobox

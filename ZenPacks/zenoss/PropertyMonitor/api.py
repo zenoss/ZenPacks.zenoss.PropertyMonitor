@@ -28,6 +28,7 @@ class IPropertyMonitorFacade(IFacade):
     '''
     Python API interface.
     '''
+
     def getClasses(self, datasourceId=None):
         '''
         Return list of dictionaries of all component classes.
@@ -37,6 +38,7 @@ class IPropertyMonitorFacade(IFacade):
         '''
         Return list of dictionaries for all properties in class_name.
         '''
+
 
 class PropertyMonitorFacade(ZuulFacade):
     '''
@@ -51,7 +53,7 @@ class PropertyMonitorFacade(ZuulFacade):
 
         classnames = [c.meta_type for c in classes if hasattr(c, 'meta_type')]
 
-        return [{ 'key': c,'label': c } for c in sorted(set(classnames))]
+        return [{'key': c, 'label': c} for c in sorted(set(classnames))]
 
     def getProperties(self, class_name, datasourceId=None):
         numericTypes = set(['float', 'int', 'long'])
@@ -59,39 +61,38 @@ class PropertyMonitorFacade(ZuulFacade):
 
         # Find the class, based on the specified meta_type.
         classes = get_all_subclasses(DeviceComponent) + \
-                  get_all_subclasses(Device)        
+                  get_all_subclasses(Device)
         for c in classes:
             if hasattr(c, 'meta_type') and c.meta_type == class_name:
                 obj = c('dummy')
                 info = IInfo(obj)
 
-                # We are attempting to show only the numeric fields.  Unfortunately, 
+                # We are attempting to show only the numeric fields.  Unfortunately,
                 # this is not exactly trivial.   There are two things we can do, however.
                 # (note that if we do get it wrong, the impact is minor- this is more
                 # about providing a convenient dropdown than about security or anything)
 
                 # 1)  Any fields identified as numeric in the info interface (that is,
                 #     from the 'Details' pane in the UI)
-                fields=FormBuilder(info).fields()
+                fields = FormBuilder(info).fields()
                 numberfields = set([x for x in fields if fields[x]['xtype'] in numericXtypes])
 
                 # 2) This is fuzzier, but we also include any fields not exposed through the
                 #    details pane, but which are still in the info adaptor, and which match
                 #    up (name-wise) with known-numeric properties of the object.
-                #    This is needed because of the common pattern of exposing via 
-                #    the UI only a string version of a numeric value, due to 
+                #    This is needed because of the common pattern of exposing via
+                #    the UI only a string version of a numeric value, due to
                 #    units conversion.
-                for field in dir(info):                    
+                for field in dir(info):
                     # aha.  A numeric one.  Add it.
                     if obj.getPropertyType(field) in numericTypes:
                         numberfields.add(field)
 
-                return [{ 'key': x, 'label': x } for x in sorted(numberfields)]
+                return [{'key': x, 'label': x} for x in sorted(numberfields)]
                 break
 
         # Unrecognized meta_type.  No properties for you.
-        return []                
-
+        return []
 
 
 class PropertyMonitorRouter(DirectRouter):

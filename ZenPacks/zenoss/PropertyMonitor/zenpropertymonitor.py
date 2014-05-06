@@ -63,6 +63,7 @@ class Preferences(object):
     def postStartup(self):
         pass
 
+
 class PropertyMonitorCollectorDaemon(CollectorDaemon):
     def buildOptions(self):
         super(PropertyMonitorCollectorDaemon, self).buildOptions()
@@ -82,8 +83,8 @@ class IntervalWorker(object):
         self._collector = zope.component.queryUtility(ICollector)
 
         self.pendingSpecs = set()
-        self._loopingCall = task.LoopingCall(self)  
-        self._running = False  
+        self._loopingCall = task.LoopingCall(self)
+        self._running = False
 
     @classmethod
     def getWorker(cls, interval):
@@ -98,10 +99,10 @@ class IntervalWorker(object):
         worker.start()
 
         return worker
-           
+
     @defer.inlineCallbacks
     def start(self):
-        if self._loopingCall.running: 
+        if self._loopingCall.running:
             return
 
         # Start (or re-start, if it stopped after an error) the loopingcall.
@@ -133,7 +134,7 @@ class IntervalWorker(object):
 
         remoteProxy = self._collector.getRemoteConfigServiceProxy()
         chunksize = self._collector.preferences.options.querychunksize
-        
+
         for specs_chunk in self.chunk(pendingSpecs, chunksize):
             processedSpecs = yield remoteProxy.callRemote('fetch_values', specs_chunk)
 
@@ -153,16 +154,15 @@ class IntervalWorker(object):
                 except Exception:
                     log.exception("writeRRD")
 
-
     def chunk(self, lst, n):
         """
         Break lst into n-sized chunks
         """
-        return [lst[i:i+n] for i in xrange(0, len(lst), n)]
+        return [lst[i:i + n] for i in xrange(0, len(lst), n)]
 
 
 class PropertyMonitorTask(BaseTask):
-    zope.interface.implements(IScheduledTask)    
+    zope.interface.implements(IScheduledTask)
 
     def __init__(self, taskName, configId, scheduleIntervalSeconds, taskConfig):
         super(PropertyMonitorTask, self).__init__(
@@ -183,7 +183,8 @@ class PropertyMonitorTask(BaseTask):
             for rrdConfig in dsConfig.rrdConfig.values():
                 valueSpec = PropertyMonitorValueSpec(dsConfig.component_path, dsConfig.property_name, rrdConfig, None)
 
-                # Queue this value up to be collected the next time the IntervalWorker for this polling interval runs.        
+                # Queue this value up to be collected the next time the
+                # IntervalWorker for this polling interval runs.
                 worker.addSpec(valueSpec)
 
         log.debug("Worker %s: Queue size is now %d." % (worker.name, worker.queueSize()))

@@ -26,6 +26,7 @@ from Products.ZenWidgets import messaging
 from Products.Zuul.interfaces import ICatalogTool, IInfo
 from Products.AdvancedQuery import Eq
 
+
 class MonitoredPropertyDataSource(ZenPackPersistence, SimpleRRDDataSource):
     '''
     Model class for MonitoredPropertyDataSource.
@@ -117,14 +118,13 @@ class MonitoredPropertyDataSource(ZenPackPersistence, SimpleRRDDataSource):
                 break
 
 
-
 class IMonitoredPropertyDataSourceInfo(IRRDDataSourceInfo):
     '''
     API Info interface for MonitoredPropertyDataSource.
     '''
 
     # The xtype for class_name also manages property_name.
-    class_name = schema.TextLine(   
+    class_name = schema.TextLine(
         title=_t(u'Property'),
         group=_t('Detail'),
         xtype='mbp_property')
