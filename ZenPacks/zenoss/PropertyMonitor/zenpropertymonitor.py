@@ -44,6 +44,7 @@ from ZenPacks.zenoss.PropertyMonitor.services.PropertyMonitorService import (
     PropertyMonitorValueSpec,
 )
 
+
 pb.setUnjellyableForClass(PropertyMonitorDataSourceConfig, PropertyMonitorDataSourceConfig)
 
 
@@ -63,7 +64,13 @@ class Preferences(object):
         pass
 
 class PropertyMonitorCollectorDaemon(CollectorDaemon):
-    pass
+    def buildOptions(self):
+        super(PropertyMonitorCollectorDaemon, self).buildOptions()
+
+        self.parser.add_option('--querychunksize',
+                               dest="querychunksize", type="int", default=256,
+                               help="Number of properties to include in each zenhub query (default=256)")
+
 
 class IntervalWorker(object):
     workers = {}
@@ -125,20 +132,33 @@ class IntervalWorker(object):
         log.info("%s processing %d pending queries" % (self.name, len(pendingSpecs)))
 
         remoteProxy = self._collector.getRemoteConfigServiceProxy()
-        processedSpecs = yield remoteProxy.callRemote('fetch_values', pendingSpecs)
+        chunksize = self._collector.preferences.options.querychunksize
+        
+        for specs_chunk in self.chunk(pendingSpecs, chunksize):
+            processedSpecs = yield remoteProxy.callRemote('fetch_values', specs_chunk)
 
-        for spec in processedSpecs:
-            log.debug("[%s] processSpec: %s" % (self.name, spec))
-            self._dataService.writeRRD(
-                spec.rrd.rrdPath,
-                spec.value,
-                spec.rrd.rrdType,
-                rrdCommand=spec.rrd.command,
-                cycleTime=self.interval,
-                min=spec.rrd.min,
-                max=spec.rrd.max,
-                timestamp=spec.timestamp
-            )
+            for spec in processedSpecs:
+                log.debug("[%s] processSpec: %s" % (self.name, spec))
+                try:
+                    self._dataService.writeRRD(
+                        spec.rrd.rrdPath,
+                        spec.value,
+                        spec.rrd.rrdType,
+                        rrdCommand=spec.rrd.command,
+                        cycleTime=self.interval,
+                        min=spec.rrd.min,
+                        max=spec.rrd.max,
+                        timestamp=spec.timestamp
+                    )
+                except Exception:
+                    log.exception("writeRRD")
+
+
+    def chunk(self, lst, n):
+        """
+        Break lst into n-sized chunks
+        """
+        return [lst[i:i+n] for i in xrange(0, len(lst), n)]
 
 
 class PropertyMonitorTask(BaseTask):

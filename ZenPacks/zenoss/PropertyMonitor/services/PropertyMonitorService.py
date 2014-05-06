@@ -135,6 +135,7 @@ class PropertyMonitorDataSourceConfig(pb.Copyable, pb.RemoteCopy):
         for dp in datasource.datapoints():
             self.rrdConfig[dp.id] = RRDConfig(component, datasource, dp)
 
+
 pb.setUnjellyableForClass(PropertyMonitorDataSourceConfig, PropertyMonitorDataSourceConfig)    
 
 
