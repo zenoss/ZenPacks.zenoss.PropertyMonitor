@@ -53,7 +53,7 @@ class MonitoredPropertyDataSource(ZenPackPersistence, SimpleRRDDataSource):
         if not self.property_name:
             return 'Not Configured'
 
-        return self.property_name
+        return "%s / %s" % (self.class_name, self.property_name)
 
     def getComponent(self, context):
         return context.id
