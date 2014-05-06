@@ -34,7 +34,7 @@ from Products.ZenCollector.interfaces import (
 from Products.ZenCollector.tasks import (
     BaseTask,
     SimpleTaskFactory,
-    SimpleTaskSplitter,
+    SubConfigurationTaskSplitter,
     TaskStates,
 )
 
@@ -73,12 +73,19 @@ class PropertyMonitorCollectorDaemon(CollectorDaemon):
                                help="Number of properties to include in each zenhub query (default=256)")
 
 
+class TaskSplitter(SubConfigurationTaskSplitter):
+    subconfigName = 'dsConfigs'
+
+    def makeConfigKey(self, config, subconfig):
+        return (config.id, str(subconfig.cycletime))
+
+
 class IntervalWorker(object):
     workers = {}
 
     def __init__(self, interval):
-        self.interval = interval
-        self.name = "IntervalWorker-%d" % (int(interval))
+        self.interval = int(interval)
+        self.name = "IntervalWorker-%d" % self.interval
         self._dataService = zope.component.queryUtility(IDataService)
         self._collector = zope.component.queryUtility(ICollector)
 
@@ -107,12 +114,12 @@ class IntervalWorker(object):
 
         # Start (or re-start, if it stopped after an error) the loopingcall.
         try:
-            log.info("Interval Worker %d LoopingCall starting" % self.interval)
+            log.info("IntervalWorker-%d LoopingCall starting" % self.interval)
             yield self._loopingCall.start(self.interval)
         except Exception:
-            log.exception("Interval Worker %d LoopingCall encountered an error" % self.interval)
+            log.exception("IntervalWorker-%d LoopingCall encountered an error" % self.interval)
         finally:
-            log.info("Interval Worker %d LoopingCall exited." % self.interval)
+            log.info("IntervalWorker-%d LoopingCall exited." % self.interval)
 
     def addSpec(self, spec):
         log.debug("[%s] addSpec: %s" % (self.name, spec))
@@ -171,7 +178,7 @@ class PropertyMonitorTask(BaseTask):
         self.name = taskName
         self.configId = configId
         self.state = TaskStates.STATE_IDLE
-        self.interval = scheduleIntervalSeconds
+        self.interval = int(scheduleIntervalSeconds)
         self.config = taskConfig
 
     def getWorker(self):
@@ -193,7 +200,7 @@ class PropertyMonitorTask(BaseTask):
 def main():
     preferences = Preferences()
     task_factory = SimpleTaskFactory(PropertyMonitorTask)
-    task_splitter = SimpleTaskSplitter(task_factory)
+    task_splitter = TaskSplitter(task_factory)
     daemon = PropertyMonitorCollectorDaemon(preferences, task_splitter)
     daemon.run()
 

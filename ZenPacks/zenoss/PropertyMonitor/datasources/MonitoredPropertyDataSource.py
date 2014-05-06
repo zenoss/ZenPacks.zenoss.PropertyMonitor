@@ -16,6 +16,7 @@ from zope.interface import implements
 
 from Products.ZenModel.RRDDataSource import SimpleRRDDataSource
 from Products.ZenModel.ZenPackPersistence import ZenPackPersistence
+from Products.ZenUtils.ZenTales import talesEvalStr
 from Products.Zuul.form import schema
 from Products.Zuul.infos import ProxyProperty
 from Products.Zuul.infos.template import RRDDataSourceInfo
@@ -39,6 +40,11 @@ class MonitoredPropertyDataSource(ZenPackPersistence, SimpleRRDDataSource):
     sourcetypes = (MBP_TYPE,)
     sourcetype = MBP_TYPE
 
+    # SimpleRRDDataSource property overrides.
+    cycletime = '${here/zPropertyMonitorInterval}'
+    eventClass = '/Ignore'
+    severity = 0
+
     class_name = ''
     property_name = ''
 
@@ -58,6 +64,21 @@ class MonitoredPropertyDataSource(ZenPackPersistence, SimpleRRDDataSource):
 
     def getComponent(self, context):
         return context.id
+
+    def talesEval(self, text, context):
+        device = context.device()
+        extra = {
+            'device': device,
+            'dev': device,
+            'devname': device.id,
+            'datasource': self,
+            'ds': self,
+            }
+
+        return talesEvalStr(str(text), context, extra=extra)
+
+    def getCycleTime(self, context):
+        return int(self.talesEval(self.cycletime, context))
 
     def testDataSourceAgainstDevice(self, testDevice, REQUEST, write, errorLog):
         """
@@ -123,6 +144,9 @@ class IMonitoredPropertyDataSourceInfo(IRRDDataSourceInfo):
     API Info interface for MonitoredPropertyDataSource.
     '''
 
+    # IRRDDataSourceInfo doesn't define this.
+    cycletime = schema.TextLine(title=_t(u'Cycle Time (seconds)'))
+
     # The xtype for class_name also manages property_name.
     class_name = schema.TextLine(
         title=_t(u'Property'),
@@ -137,6 +161,9 @@ class MonitoredPropertyDataSourceInfo(RRDDataSourceInfo):
 
     implements(IMonitoredPropertyDataSourceInfo)
     adapts(MonitoredPropertyDataSource)
+
+    # RRDDataSourceInfo doesn't define this.
+    cycletime = ProxyProperty('cycletime')
 
     class_name = ProxyProperty('class_name')
     property_name = ProxyProperty('property_name')

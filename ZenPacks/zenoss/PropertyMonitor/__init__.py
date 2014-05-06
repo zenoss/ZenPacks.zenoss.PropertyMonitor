@@ -25,7 +25,11 @@ from . import zenpacklib
 
 CFG = zenpacklib.ZenPackSpec(
     name=__name__,
-    zProperties={},
+    zProperties={
+        'DEFAULTS': {'category': 'Property Monitor'},
+        'zPropertyMonitorInterval': {'type': 'int', 'default': 300},
+    },
+
     classes={},
     class_relationships={}
 )

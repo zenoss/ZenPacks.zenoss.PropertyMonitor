@@ -125,6 +125,7 @@ class PropertyMonitorDataSourceConfig(pb.Copyable, pb.RemoteCopy):
 
     def __init__(self, device, component, template, datasource):
         self.device = device.id
+        self.cycletime = datasource.getCycleTime(component or device)
         self.datasourceId = datasource.id
         self.class_name = datasource.class_name
         self.component_path = component.getPrimaryUrlPath()
