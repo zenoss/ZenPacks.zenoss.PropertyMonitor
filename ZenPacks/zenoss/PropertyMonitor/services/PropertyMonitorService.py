@@ -30,42 +30,38 @@ class PropertyMonitorService(CollectorConfigService):
         proxy = CollectorConfigService._createDeviceProxy(self, device)
 
         proxy.configCycleInterval = 5 * 60
-        proxy.dsConfigs = []
-        proxy.thresholds = []
+        proxy.dsConfigs = list(self._dsConfigs(device))
+        proxy.thresholds = device.getThresholdInstances(
+            MonitoredPropertyDataSource.sourcetype)
 
         proxy.thresholds += device.getThresholdInstances(
             MonitoredPropertyDataSource.sourcetype)
 
         # We only worry about monitoring templates against components right now.
         for component in device.getMonitoredComponents():
-            for template in component.getRRDTemplates():
-                for ds in self._getDataSourcesFromTemplate(template):
-                    try:
-                        dsConfig = PropertyMonitorDataSourceConfig(
-                            device, component, template, ds)
-
-                        # Filter out anything that is not applicable to
-                        # this component type for some reason.
-                        if dsConfig.class_name == component.meta_type:
-                            proxy.dsConfigs.append(dsConfig)
-
-                    except Exception, e:
-                        log.exception(e)
-
-            proxy.thresholds += component.getThresholdInstances(
-                MonitoredPropertyDataSource.sourcetype)
+            proxy.dsConfigs.extend(self._dsConfigs(component))
+            proxy.thresholds.extend(component.getThresholdInstances(
+                MonitoredPropertyDataSource.sourcetype))
 
         return proxy
 
-    def _getDataSourcesFromTemplate(self, template):
-        datasources = []
+    def _dsConfigs(self, deviceOrComponent):
+        for template in deviceOrComponent.getRRDTemplates():
+            for datasource in template.getRRDDataSources("Property"):
+                if not datasource.enabled:
+                    continue
 
-        for ds in template.getRRDDataSources("Property"):
-            if not ds.enabled:
-                continue
-            datasources.append(ds)
+                try:
+                    dsConfig = PropertyMonitorDataSourceConfig(
+                        deviceOrComponent, template, datasource)
 
-        return datasources
+                    # Filter out anything that is not applicable to
+                    # this component type for some reason.
+                    if dsConfig.class_name == deviceOrComponent.meta_type:
+                        yield dsConfig
+
+                except Exception, e:
+                    log.exception(e)
 
     def remote_fetch_values(self, valueSpecs):
         for spec in valueSpecs:
@@ -123,17 +119,17 @@ class PropertyMonitorDataSourceConfig(pb.Copyable, pb.RemoteCopy):
     Represents a single PropertyMonitor datasource.
     """
 
-    def __init__(self, device, component, template, datasource):
-        self.device = device.id
-        self.cycletime = datasource.getCycleTime(component or device)
+    def __init__(self, deviceOrComponent, template, datasource):
+        self.device = deviceOrComponent.device().id
+        self.cycletime = datasource.getCycleTime(deviceOrComponent)
         self.datasourceId = datasource.id
         self.class_name = datasource.class_name
-        self.component_path = component.getPrimaryUrlPath()
+        self.component_path = deviceOrComponent.getPrimaryUrlPath()
         self.property_name = datasource.property_name
 
         self.rrdConfig = {}
         for dp in datasource.datapoints():
-            self.rrdConfig[dp.id] = RRDConfig(component, datasource, dp)
+            self.rrdConfig[dp.id] = RRDConfig(deviceOrComponent, datasource, dp)
 
 
 pb.setUnjellyableForClass(PropertyMonitorDataSourceConfig, PropertyMonitorDataSourceConfig)
@@ -146,14 +142,14 @@ class RRDConfig(pb.Copyable, pb.RemoteCopy):
     values for a datapoint
     """
 
-    def __init__(self, component, datasource, dp):
+    def __init__(self, deviceOrComponent, datasource, dp):
         self.dpName = dp.name()
         self.command = dp.createCmd
         self.dataPointId = dp.id
         self.min = dp.rrdmin
         self.max = dp.rrdmax
         self.rrdType = dp.rrdtype
-        self.rrdPath = '/'.join((component.rrdPath(), dp.name()))
+        self.rrdPath = '/'.join((deviceOrComponent.rrdPath(), dp.name()))
 
 
 pb.setUnjellyableForClass(RRDConfig, RRDConfig)
