@@ -48,7 +48,8 @@ class MonitoredPropertyDataSource(ZenPackPersistence, SimpleRRDDataSource):
     class_name = ''
     property_name = ''
 
-    _properties = SimpleRRDDataSource._properties + (
+    _properties = tuple([p for p in SimpleRRDDataSource._properties if p['id'] != 'cycletime']) + (
+        {'id': 'cycletime', 'type': 'string', 'mode': 'w'},
         {'id': 'class_name', 'type': 'string', 'mode': 'w'},
         {'id': 'property_name', 'type': 'string', 'mode': 'w'},
     )
