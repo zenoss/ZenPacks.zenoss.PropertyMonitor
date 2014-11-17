@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    >
+
+    <!-- API: Infos -->
+    <adapter
+        provides=".datasources.MonitoredPropertyDataSource.IMonitoredPropertyDataSourceInfo"
+        for=".datasources.MonitoredPropertyDataSource.MonitoredPropertyDataSource"
+        factory=".datasources.MonitoredPropertyDataSource.MonitoredPropertyDataSourceInfo"
+        />
+
+	<!-- API: Routers -->
+    <include package="Products.ZenUtils.extdirect.zope" file="meta.zcml"/>
+
+    <browser:directRouter
+        name="propertymonitor_router"
+        for="*"
+        class=".api.PropertyMonitorRouter"
+        namespace="Zenoss.remote"
+        permission="zenoss.View"
+        />
+
+    <!-- API: Facades -->
+    <adapter
+        name="propertymonitor"
+        provides=".api.IPropertyMonitorFacade"
+        for="*"
+        factory=".api.PropertyMonitorFacade"
+        />
+
+</configure>
