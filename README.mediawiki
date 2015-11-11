@@ -1,0 +1,35 @@
+This ZenPack provides support for monitoring any numeric property of any Zenoss
+component.
+
+== Gallery ==
+<gallery widths=250px heights=127px>
+edit_datasource.png
+</gallery>
+
+== Features ==
+
+This ZenPack provides a new datasource type ("Property"), which allows you
+to pull the current numeric value of any numeric property of any zenoss Device
+or DeviceComponent object.
+
+These datasources may then be used in monitoring templates to build graphs
+and thresholds.
+
+== Installed Items ==
+
+Installing this ZenPack will add the following items to your Zenoss system.
+
+;Configuration Properties
+* zPropertyMonitorInterval: Polling interval of the configured property data sources.  This is a systemwide setting, and defaults to 300 (5 minutes)
+
+;Datasource Types
+* Property
+
+;Collector Daemons
+* zenpropertymonitor
+
+
+== Changes ==
+
+;1.0.0
+* Initial release.

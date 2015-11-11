@@ -72,6 +72,11 @@ class PropertyMonitorCollectorDaemon(CollectorDaemon):
                                dest="querychunksize", type="int", default=256,
                                help="Number of properties to include in each zenhub query (default=256)")
 
+    def getDevicePingIssues(result):
+        # we don't care about device connectivity issues, since all
+        # data is pulled from zenhub anyway.
+        return defer.succeed([])
+
 
 class TaskSplitter(SubConfigurationTaskSplitter):
     subconfigName = 'dsConfigs'
