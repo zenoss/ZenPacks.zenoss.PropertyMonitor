@@ -31,5 +31,8 @@ Installing this ZenPack will add the following items to your Zenoss system.
 
 == Changes ==
 
+;1.1.1
+* Fix errors that can occur with components with certain characters in their IDs (ZPS-293)
+
 ;1.0.0
 * Initial release.
