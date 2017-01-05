@@ -124,7 +124,7 @@ class PropertyMonitorDataSourceConfig(pb.Copyable, pb.RemoteCopy):
         self.cycletime = datasource.getCycleTime(deviceOrComponent)
         self.datasourceId = datasource.id
         self.class_name = datasource.class_name
-        self.component_path = deviceOrComponent.getPrimaryUrlPath()
+        self.component_path = deviceOrComponent.getPrimaryId()
         self.property_name = datasource.property_name
 
         self.rrdConfig = {}
