@@ -18,6 +18,7 @@ import Globals
 
 import zope.component
 import zope.interface
+import json
 
 from twisted.internet import defer, task
 from twisted.spread import pb
@@ -97,6 +98,10 @@ class IntervalWorker(object):
         self.pendingSpecs = set()
         self._loopingCall = task.LoopingCall(self)
         self._running = False
+        self.writeMetricWithMetadata = hasattr(
+            self._dataService, 'writeMetricWithMetadata')
+        self.metricExtraTags = getattr(
+            self._dataService, "metricExtraTags", False)
 
     @classmethod
     def getWorker(cls, interval):
@@ -151,26 +156,59 @@ class IntervalWorker(object):
             processedSpecs = yield remoteProxy.callRemote('fetch_values', specs_chunk)
 
             for spec in processedSpecs:
+                tags = getattr(spec.rrd, "tags", None)
+                if tags and self.metricExtraTags:
+                    write_kwargs = {"extraTags": tags}
+                else:
+                    write_kwargs = {}
                 log.debug("[%s] processSpec: %s" % (self.name, spec))
                 try:
-                    self._dataService.writeRRD(
-                        spec.rrd.rrdPath,
-                        spec.value,
-                        spec.rrd.rrdType,
-                        rrdCommand=spec.rrd.command,
-                        cycleTime=self.interval,
-                        min=spec.rrd.min,
-                        max=spec.rrd.max,
-                        timestamp=spec.timestamp
-                    )
-                except Exception:
-                    log.exception("writeRRD")
+                    if self.writeMetricWithMetadata:
+                        metadata, metric = self.extract_metadata(spec.rrd.rrdPath)
+                        yield defer.maybeDeferred(
+                            self._dataService.writeMetricWithMetadata,
+                            metric,
+                            spec.value,
+                            spec.rrd.rrdType,
+                            timestamp=spec.timestamp,
+                            min=spec.rrd.min,
+                            max=spec.rrd.max,
+                            metadata=metadata,
+                            **write_kwargs)
+                    else:
+                        yield defer.maybeDeferred(
+                            self._dataService.writeRRD,
+                            spec.rrd.rrdPath,
+                            spec.value,
+                            spec.rrd.rrdType,
+                            rrdCommand=spec.rrd.command,
+                            cycleTime=self.interval,
+                            min=spec.rrd.min,
+                            max=spec.rrd.max)
+
+                except Exception as e:
+                    log.exception("An exception occurred during write metric call for datapoint - {}. "
+                                  "Exception message: {}".format(spec.rrd.dpName, e))
 
     def chunk(self, lst, n):
         """
         Break lst into n-sized chunks
         """
         return [lst[i:i + n] for i in xrange(0, len(lst), n)]
+
+    def extract_metadata(self, path):
+        """
+        Extracts metadata from datapoint's RRD Path.
+        """
+        metricinfo, metric = path.rsplit("/", 1)
+        if "METRIC_DATA" not in str(metricinfo):
+            raise Exception(
+                "Unable to write Metric with given path { %s } "
+                "please see the rrdpath method" % (metricinfo,)
+            )
+
+        metadata = json.loads(metricinfo)
+        return metadata, metric
 
 
 class PropertyMonitorTask(BaseTask):
