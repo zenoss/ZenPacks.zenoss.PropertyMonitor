@@ -150,6 +150,10 @@ class RRDConfig(pb.Copyable, pb.RemoteCopy):
         self.max = dp.rrdmax
         self.rrdType = dp.rrdtype
         self.rrdPath = '/'.join((deviceOrComponent.rrdPath(), dp.name()))
+        if dp.aqBaseHasAttr("getTags"):
+            self.tags = dp.getTags(deviceOrComponent)
+        else:
+            self.tags = {}
 
 
 pb.setUnjellyableForClass(RRDConfig, RRDConfig)
