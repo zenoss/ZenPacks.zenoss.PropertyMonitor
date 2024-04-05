@@ -28,13 +28,13 @@ unused(Globals)
 class PropertyMonitorService(CollectorConfigService):
     def _filterDevice(self, device):
         include = CollectorConfigService._filterDevice(self, device)
-        has_property_ds = False
-        for component in device.getMonitoredComponents():
-            if has_property_ds:
-                break
-            for template in component.getRRDTemplates():
-                if template.getRRDDataSources("Property"):
-                    has_property_ds = True
+        # Check datasources on the device level
+        has_property_ds = any(template.getRRDDataSources("Property") for template in device.getRRDTemplates())
+        # Check datasources on the components level
+        if not has_property_ds:
+            has_property_ds = any(template.getRRDDataSources("Property")
+                                  for component in device.getMonitoredComponents()
+                                  for template in component.getRRDTemplates())
 
         return include and has_property_ds
 
