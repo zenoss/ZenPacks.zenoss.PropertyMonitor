@@ -26,6 +26,18 @@ unused(Globals)
 
 
 class PropertyMonitorService(CollectorConfigService):
+    def _filterDevice(self, device):
+        include = CollectorConfigService._filterDevice(self, device)
+        has_property_ds = False
+        for component in device.getMonitoredComponents():
+            if has_property_ds:
+                break
+            for template in component.getRRDTemplates():
+                if template.getRRDDataSources("Property"):
+                    has_property_ds = True
+
+        return include and has_property_ds
+
     def _createDeviceProxy(self, device):
         proxy = CollectorConfigService._createDeviceProxy(self, device)
 
