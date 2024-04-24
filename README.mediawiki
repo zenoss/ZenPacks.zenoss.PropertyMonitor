@@ -31,6 +31,9 @@ Installing this ZenPack will add the following items to your Zenoss system.
 
 == Changes ==
 
+;1.1.3
+* Make PropertyMonitor ZenPack compatible with Ubuntu-based CZ 7.2 (ZPS-8870)
+
 ;1.1.2
 * Fix metrics forwarding for Zenoss Cloud (ZPS-8796)
 
